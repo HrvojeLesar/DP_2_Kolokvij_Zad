@@ -1,12 +1,15 @@
 #!/usr/bin/bash
 
+# ncat -kl -p 1234 -c ./turing.sh 
+
 declare -A TAPE
 
 TAPEPOSITION=0
 
 function readStateInput() {
     echo "Inicijalno stanje moze biti bilo koji simbol"
-    read -p "Unesite inicijalno stanje: " STATE
+    echo -n "Unesite inicijalno stanje: " 
+    read STATE
     if [[ $STATE == "" ]]; then
         STATE="0"
     fi
@@ -14,7 +17,8 @@ function readStateInput() {
 
 function readTapeInput() {
     echo "Inicijalno stanje vrpce; simboli su odvojeni razmakom, prazni simbol je 0"
-    read -p "Unesite inicijalno stanje vrpce: " -a intape
+    echo -n "Unesite inicijalno stanje vrpce: "
+    read -a intape
     if [[ $intape == "" ]]; then
         intape="0"
     fi
@@ -33,7 +37,8 @@ function readInstructionsInput() {
     echo "Za završetak unosa instrukcija unesite prazni red"
     local counter=0
     while true; do
-        read -p "Instrukcija: " instruction
+        echo -n "Instrukcija: "
+        read instruction
         if [[ $instruction == "" ]]; then
             break
         fi
@@ -86,8 +91,11 @@ function runInstruction() {
 function printTape() {
     pTape=""
     for idx in "${!TAPE[@]}"; do
-        pTape+="Pozicija na vrpci: [$idx] | Vrijednost: [${TAPE[$idx]}]\n"
+        pTape+="$idx | ${TAPE[$idx]}\n"
     done
+    echo --------------
+    echo REZULTATI:
+    echo "POZICIJA NA VRPCI | VRIJEDNOST"
     echo -e $pTape | sort -n | awk NF
 }
 
