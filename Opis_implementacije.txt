@@ -1,0 +1,163 @@
+Izjavljujem da je rješenje zadatka izvorni rezultat mojeg rada te da se u izradi istoga nisam koristio drugim izvorima osim onima koji su u njemu navedeni.
+Za izradu rada su korištene etički prikladne i prihvatljive metode i tehnike rada.
+
+Svaka implementacija je temeljena na izvođenju instrukcija
+definiranih na https://en.wikipedia.org/wiki/Turing_machine#Additional_details_required_to_visualize_or_implement_Turing_machines
+(3-state 2-symbol busy beaver)
+
+Za svaku implementaciju vrijedi da su smjerovi kretanja:
+"L" za lijevo
+"R" za desno
+"N" nema promjene
+
+Također vrijedi da su sljedeći simboli rezervirani za neke mogućnosti:
+"E" brisanje trenutnog simbola na poziciji ispod glave (postavljanje na "0")
+"N" nema promjene simbola na traci
+"H" stanje u kojem se izvođenje programa zaustavlja
+
+Napomena: Ni jedana implementacija ne provjerava ako će prema unesenim instrukcijama
+stroj ikad završiti. Također je bitno da se stanje u kojem se izvođenje zaustavlja
+označava simbolom "H", uvijek velikim slovom.
+
+#### 1.
+Zadatak je implementiran u javascriptu.
+runMachine funkcija je funkcija koja pokreće turingov stroj.
+Funkcija kao prvi argument prima početno stanje stroja.
+Drugi argument je objekt koji označava poziciju na traci
+na kojoj je već zapisan neki simbol. 
+({"0": "0"}) -> Na pozicija 0 zapisan je simbol "0".
+Treći argument je pozicija na kojoj glava poćinje.
+Četvrti argument je objekt koji označava sve instrukcije kojima
+stroj može baratati. Objekt sadržava druge objekte.
+Prvi identifikator objekta označava očekivano stanje stroja
+za odabir te instrukcije. U odabranom objektu nalazi se drugi objekt
+kojemu identifikator označava očekivanu pročitani simbol s trake
+da bi instukcija bila odabrana. Vrijednosti drugog objekta su
+`printSymbol`, `direction` i `newState`.
+Primjer objekta = {A: {"0": { printSymbol: "1", direction: "R", newState: "B"}}}
+Zadnji argument funkcije je symbol koji će označavati pazno mjesto na traci
+i opcionalan je. Postavljena vrijednost je "0".
+
+Kao rezultat vraća objekt pozicija na vrpci koje je glava posjetila i 
+na koja je možda eventualno nešto zapisala.
+
+#### 2.
+Implementacija u bashu. Minimalna potrebna bash verzija 4.0 zbog
+korištenja asocijativnih nizova.
+Skripta se može kao poslužitelj pokrenuti u netcat-u korištenjem sljedeće
+naredbe: `ncat -kl -p 1234 -c ./turing.sh` (ako se nalazimo u istom direktoriju kao i skripta)
+Za povezivanje na poslužitelj unosi se naredba `ncat localhost 1234`
+Skripta prvo traži da se unese inicijalno stanje stroja.
+Potom traži inicijalno stanje vrpce.
+Sljedeće traži unos instrukcija.
+Instukcije moraju biti u sljedećem obliku: 
+<Očekivano stanje> <Očekivani skenirani simbol s trake> <Simbol za ispis> <Smjer kretanja> <Novo stanje>
+Primjer: A 0 1 R B
+Kao rezultat ispisuje pozicije i simbole na vrpci.
+
+#### 3.
+Korištena verzija 4.9 antlr4 python runtimea (pip3 install --upgrade antlr4-python3-runtime==4.9)
+Pokretanje naredbom `antlr4 -Dlanguage=Python3 turing.g4 && python3 turing.py`
+Za postavljanje inicijalnog stanja stroja upisuje se `set_state` <Simbol stanja>.
+Postavljanje trake moguće je naredbom `set_tape` <Simbol stanja>. Kod postavljanja
+trake moguće je upisati proizvoljni broj simbola i svi će redom biti postavljeni.
+Naredbom `add_instruction` se dodaje nova instrukcija za stroj.
+Unos je jednak kao u zadatku 2.
+Primjer: add_instruction A 0 1 R B
+Četvrti simbol, odnosno simbol za odabir smjera mora biti L ili R ili N.
+Naredba `clear_instructions` briše sve postavljene instrukcije.
+Naredbom `run` se pokreće stroj.
+
+
+#### 4.
+Inform7 implementacija.
+Počinje se u sobi sa strojem. Stroj objašnjava cilj.
+Stroju se može postaviti inicijalno stanje, inicijalna traka, te
+instrukcije korištenjem sljedećih naredbi.
+
+Postavljanje inicijalnog stanja stroja.
+`tell the machine to set initial state to <Simbol>`
+
+Dodavanje simbola na traku i ispis trenutne trake.
+`tell the machine to add symbol <Simbol> to tape`
+
+Stroj počinje s jednom instrukcijom tj. nije potrebno
+dodavati novu instrukciju za postavljanje prve, te nakon
+postavljanja zadnje instrukcije nije potrebno upisati
+naredbu za dodavanje nove instrukcije. Instrukcije moraju
+biti potpune.
+
+Za postavljanje jedne instrukcije potrebno je stroju reći
+na koje simbole treba postaviti očekivano stanje, očekivani simbol,
+simbol ispisa (simbol koji će biti zapisan na traku), smjer kretanja,
+sljedeće stanje. Maksimalni broj instrukcija je 100.
+Instrukcija se postavlja sljedećim naredbama:
+
+`tell the machine to set expected state to <Simbol>`
+`tell the machine to set expected symbol to <Simbol>`
+`tell the machine to set print symbol to <Simbol>`
+`tell the machine to set move direction to <Simbol>`
+`tell the machine to set next state to B <Simbol>`
+
+Za dodavanje sljedeće instrukcije koristi se naredba:
+`tell the machine to add new instruction`
+
+Naredbom `tell the machine to start` se pokreće stroj.
+Ako stroj završi s izvođenjem otvaraju se izlazna vrata.
+
+Sljedeće su redovi koji se mogu ubaciti pod `Table of Instructions`
+u Inform7 programu za brže pokretanje 3-state 2-symbol busy beaver
+(Napomena: paziti na tabove, razmake):
+"A"	"0"	"1"	"R"	"B"
+"A"	"1"	"1"	"L"	"C"
+"B"	"0"	"1"	"L"	"A"
+"B"	"1"	"1"	"R"	"B"
+"C"	"0"	"1"	"L"	"B"
+"C"	"1"	"1"	"N"	"H"
+
+Očekivani način za unos instrukcija (3-state 2-symbol busy beaver)
+
+```
+tell the machine to set expected state to A
+tell the machine to set expected symbol to 0
+tell the machine to set print symbol to 1
+tell the machine to set move direction to R
+tell the machine to set next state to B
+tell the machine to add new instruction
+
+tell the machine to set expected state to A
+tell the machine to set expected symbol to 1
+tell the machine to set print symbol to 1
+tell the machine to set move direction to L
+tell the machine to set next state to C
+tell the machine to add new instruction
+
+tell the machine to set expected state to B
+tell the machine to set expected symbol to 0
+tell the machine to set print symbol to 1
+tell the machine to set move direction to L
+tell the machine to set next state to A
+tell the machine to add new instruction
+
+tell the machine to set expected state to B
+tell the machine to set expected symbol to 1
+tell the machine to set print symbol to 1
+tell the machine to set move direction to R
+tell the machine to set next state to B
+tell the machine to add new instruction
+
+tell the machine to set expected state to C
+tell the machine to set expected symbol to 0
+tell the machine to set print symbol to 1
+tell the machine to set move direction to L
+tell the machine to set next state to B
+tell the machine to add new instruction
+
+tell the machine to set expected state to C
+tell the machine to set expected symbol to 1
+tell the machine to set print symbol to 1
+tell the machine to set move direction to N
+tell the machine to set next state to H
+
+tell the machine to start
+```

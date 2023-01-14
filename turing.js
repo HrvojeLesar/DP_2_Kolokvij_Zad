@@ -59,9 +59,3 @@ const threeStateTwoSymbolBusyBeaverResult = runMachine("A", { "0": "0" }, 0, {
     },
 });
 console.log(threeStateTwoSymbolBusyBeaverResult);
-
-// RESERVED SYMBOLS
-// STOP SYMBOL = H
-// PRINTSYMBOL = E, N
-// DIRECTION = L, R, N
-// DEFAULT BLANK SYMBOL = 0

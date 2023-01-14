@@ -1,7 +1,5 @@
 #!/usr/bin/bash
 
-# ncat -kl -p 1234 -c ./turing.sh 
-
 declare -A TAPE
 
 TAPEPOSITION=0
