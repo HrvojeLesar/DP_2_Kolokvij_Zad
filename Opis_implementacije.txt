@@ -53,6 +53,7 @@ Sljedeće traži unos instrukcija.
 Instukcije moraju biti u sljedećem obliku: 
 <Očekivano stanje> <Očekivani skenirani simbol s trake> <Simbol za ispis> <Smjer kretanja> <Novo stanje>
 Primjer: A 0 1 R B
+Za pokretanje stroja instrukcija se osvalja prazna.
 Kao rezultat ispisuje pozicije i simbole na vrpci.
 
 #### 3.
