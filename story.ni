@@ -128,7 +128,7 @@ Carry out starting the machine:
 					add "0" to tape;
 				break;
 	say "After the program finished symbols on the tape from left to right are: [tape][line break]";
-	Now door lock is 1;
+	Now door lock is 0;
 	say "Thank you for playing along. I have unlocked the door now. You can leave whenever you wish to."
 
 The exit is a room. It is west of the laboratory. The description is 
